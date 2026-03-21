@@ -159,7 +159,7 @@ html, body, #root {
 .bubble-wrap {
   position: absolute;
   transform: translateX(-50%);
-  animation: bubble-wrap-life 5s ease forwards;
+  animation: bubble-wrap-life 6s ease forwards;
 }
 
 @keyframes bubble-wrap-life {
@@ -172,38 +172,38 @@ html, body, #root {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: #00ff41;
   box-shadow: 0 0 8px #00ff41, 0 0 16px rgba(0, 255, 65, 0.5);
-  animation: dot-rise 5s ease forwards;
+  animation: dot-rise 6s ease forwards;
 }
 
 @keyframes dot-rise {
-  0%   { bottom: -200px; opacity: 0; }
-  8%   { bottom: -200px; opacity: 1; }
-  38%  { bottom: 18px;   opacity: 1; }
-  75%  { bottom: 18px;   opacity: 0.6; }
-  100% { bottom: 18px;   opacity: 0; }
+  0%   { bottom: -180px; opacity: 0; }
+  6%   { bottom: -180px; opacity: 1; }
+  30%  { bottom: 14px;   opacity: 1; }
+  78%  { bottom: 14px;   opacity: 0.7; }
+  100% { bottom: 14px;   opacity: 0; }
 }
 
 .bubble-card {
-  background: rgba(0, 4, 0, 0.88);
-  border: 1px solid rgba(0, 255, 65, 0.55);
-  box-shadow: 0 0 18px rgba(0, 255, 65, 0.1), inset 0 0 12px rgba(0, 0, 0, 0.6);
-  padding: 10px 14px;
-  min-width: 220px;
-  max-width: 260px;
-  animation: card-appear 5s ease forwards;
+  background: rgba(0, 4, 0, 0.9);
+  border: 1px solid rgba(0, 255, 65, 0.5);
+  box-shadow: 0 0 14px rgba(0, 255, 65, 0.12), inset 0 0 8px rgba(0, 0, 0, 0.7);
+  padding: 8px 12px;
+  min-width: 190px;
+  max-width: 230px;
+  animation: card-appear 6s ease forwards;
 }
 
 @keyframes card-appear {
-  0%   { opacity: 0; transform: translateY(6px) scale(0.97); }
-  28%  { opacity: 0; transform: translateY(6px) scale(0.97); }
-  42%  { opacity: 1; transform: translateY(0)   scale(1); }
+  0%   { opacity: 0; transform: translateY(6px) scale(0.96); }
+  22%  { opacity: 0; transform: translateY(6px) scale(0.96); }
+  34%  { opacity: 1; transform: translateY(0)   scale(1); }
   80%  { opacity: 1; transform: translateY(0)   scale(1); }
-  100% { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  100% { opacity: 0; transform: translateY(-3px) scale(0.98); }
 }
 
 .bubble-header {

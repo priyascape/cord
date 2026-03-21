@@ -44,7 +44,7 @@ const NOTIFICATIONS: Omit<Bubble, "id" | "left" | "top">[] = [
   { streamIdx: 1, label: "GMAIL", icon: "✉", text: "AV setup confirmation pending — Max" },
 ];
 
-const BUBBLE_DURATION = 5000;
+const BUBBLE_DURATION = 6000;
 
 let bubbleIdCounter = 0;
 
@@ -81,26 +81,35 @@ export default function CordScreen() {
   const notifIndexRef = useRef(0);
 
   useEffect(() => {
+    const timers: ReturnType<typeof setTimeout>[] = [];
+
     const spawnBubble = () => {
       if (uiStateRef.current !== "idle") return;
       const notif = NOTIFICATIONS[notifIndexRef.current % NOTIFICATIONS.length];
       notifIndexRef.current += 1;
       const streamCenter = notif.streamIdx * 20 + 10;
-      const left = streamCenter + (Math.random() * 8 - 4);
-      const top = 12 + Math.random() * 38;
+      const left = streamCenter + (Math.random() * 10 - 5);
+      const top = 8 + Math.random() * 55;
       const id = bubbleIdCounter++;
       const bubble: Bubble = { id, left, top, ...notif };
       setBubbles((prev) => [...prev, bubble]);
-      setTimeout(() => {
+      const t = setTimeout(() => {
         setBubbles((prev) => prev.filter((b) => b.id !== id));
       }, BUBBLE_DURATION);
+      timers.push(t);
     };
 
-    const interval = setInterval(spawnBubble, 3500);
-    const initial = setTimeout(spawnBubble, 800);
+    // pre-seed 4 bubbles at staggered times so screen fills immediately
+    [300, 900, 1800, 2700].forEach((delay) => {
+      const t = setTimeout(spawnBubble, delay);
+      timers.push(t);
+    });
+
+    const interval = setInterval(spawnBubble, 2000);
+
     return () => {
       clearInterval(interval);
-      clearTimeout(initial);
+      timers.forEach(clearTimeout);
     };
   }, []);
 
