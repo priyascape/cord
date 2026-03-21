@@ -69,6 +69,12 @@ export default function CordScreen() {
   const [transcript, setTranscript] = useState("");
   const [aiResponse, setAiResponse] = useState("");
   const [error, setError] = useState("");
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const tick = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(tick);
+  }, []);
 
   const [bubbles, setBubbles] = useState<Bubble[]>([]);
 
@@ -438,6 +444,15 @@ export default function CordScreen() {
   return (
     <div className="cord-root">
       <canvas ref={canvasRef} className="cord-canvas" />
+
+      <div className="cord-clock">
+        <span className="cord-clock-time">
+          {now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}
+        </span>
+        <span className="cord-clock-date">
+          {now.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+        </span>
+      </div>
 
       <div className="bubbles-layer">
         {bubbles.map((b) => (
