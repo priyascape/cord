@@ -51,7 +51,7 @@ const NOTIFICATIONS: Omit<Bubble, "id" | "left" | "top">[] = [
     streamIdx: 3,
     label: "GPTZERO AGENT",
     icon: "⚠",
-    text: "Hallucinated citation detected: OpenReview ID #4471 — non-existent reference found",
+    text: "⚠ GPTZero: Paper #4471 — hallucinated citation detected: 'Chen et al. 2023, Nature ML' does not exist. Authors: Google Brain / Cambridge.",
     warning: true,
     duration: WARNING_BUBBLE_DURATION,
   },
