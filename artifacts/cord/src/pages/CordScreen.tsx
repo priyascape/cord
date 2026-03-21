@@ -34,17 +34,28 @@ interface Bubble {
   text: string;
   left: number;
   top: number;
+  warning?: boolean;
+  duration?: number;
 }
 
-const NOTIFICATIONS: Omit<Bubble, "id" | "left" | "top">[] = [
-  { streamIdx: 0, label: "SLACK", icon: "◉", text: "Terri: travel grant doc needs sign-off" },
-  { streamIdx: 1, label: "GMAIL", icon: "✉", text: "14 new paper submissions in review queue" },
-  { streamIdx: 2, label: "CALENDAR", icon: "◈", text: "NeurIPS Creative AI call — 3pm today" },
-  { streamIdx: 0, label: "SLACK", icon: "◉", text: "Creative AI schedule needed by EOD" },
-  { streamIdx: 1, label: "GMAIL", icon: "✉", text: "AV setup confirmation pending — Max" },
-];
+const DEFAULT_BUBBLE_DURATION = 6000;
+const WARNING_BUBBLE_DURATION = 9500;
 
-const BUBBLE_DURATION = 6000;
+const NOTIFICATIONS: Omit<Bubble, "id" | "left" | "top">[] = [
+  { streamIdx: 0, label: "SLACK",    icon: "◉", text: "Terri: travel grant doc needs sign-off" },
+  { streamIdx: 1, label: "GMAIL",    icon: "✉", text: "14 new paper submissions in review queue" },
+  { streamIdx: 2, label: "CALENDAR", icon: "◈", text: "NeurIPS Creative AI call — 3pm today" },
+  { streamIdx: 0, label: "SLACK",    icon: "◉", text: "Creative AI schedule needed by EOD" },
+  { streamIdx: 1, label: "GMAIL",    icon: "✉", text: "AV setup confirmation pending — Max" },
+  {
+    streamIdx: 3,
+    label: "GPTZERO",
+    icon: "⚠",
+    text: "Hallucinated citation detected: OpenReview ID #4471 — non-existent reference found",
+    warning: true,
+    duration: WARNING_BUBBLE_DURATION,
+  },
+];
 
 const makeBubbleId = () => Date.now() * 1000 + Math.floor(Math.random() * 1000);
 
@@ -98,10 +109,11 @@ export default function CordScreen() {
       const top = 8 + Math.random() * 55;
       const id = makeBubbleId();
       const bubble: Bubble = { id, left, top, ...notif };
+      const bubbleDuration = notif.duration ?? DEFAULT_BUBBLE_DURATION;
       setBubbles((prev) => [...prev, bubble]);
       const t = setTimeout(() => {
         setBubbles((prev) => prev.filter((b) => b.id !== id));
-      }, BUBBLE_DURATION);
+      }, bubbleDuration);
       timers.push(t);
     };
 
@@ -488,13 +500,13 @@ export default function CordScreen() {
             style={{ left: `${b.left}%`, top: `${b.top}%` }}
           >
             <div className="bubble-dot" />
-            <div className="bubble-card">
+            <div className={`bubble-card${b.warning ? " bubble-card--warning" : ""}`}>
               <div className="bubble-header">
-                <span className="bubble-icon">{b.icon}</span>
-                <span className="bubble-label">{b.label}</span>
+                <span className={`bubble-icon${b.warning ? " bubble-icon--warning" : ""}`}>{b.icon}</span>
+                <span className={`bubble-label${b.warning ? " bubble-label--warning" : ""}`}>{b.label}</span>
                 <span className="bubble-cursor">_</span>
               </div>
-              <div className="bubble-text">{b.text}</div>
+              <div className={`bubble-text${b.warning ? " bubble-text--warning" : ""}`}>{b.text}</div>
             </div>
           </div>
         ))}

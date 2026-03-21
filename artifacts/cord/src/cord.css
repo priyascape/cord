@@ -246,6 +246,27 @@ html, body, #root {
   letter-spacing: 0.03em;
 }
 
+/* ── Warning bubble (amber) ──────────────────────────── */
+.bubble-card--warning {
+  border-color: rgba(255, 180, 0, 0.7);
+  box-shadow: 0 0 18px rgba(255, 180, 0, 0.18), inset 0 0 10px rgba(0, 0, 0, 0.7);
+  background: rgba(8, 4, 0, 0.92);
+}
+
+.bubble-icon--warning {
+  color: #ffb400;
+  text-shadow: 0 0 8px rgba(255, 180, 0, 0.9);
+}
+
+.bubble-label--warning {
+  color: rgba(255, 180, 0, 0.75);
+  letter-spacing: 0.22em;
+}
+
+.bubble-text--warning {
+  color: rgba(255, 200, 80, 0.92);
+}
+
 /* ── Transcript ──────────────────────────────────────── */
 .cord-transcript {
   position: fixed;

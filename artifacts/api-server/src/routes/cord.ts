@@ -5,7 +5,7 @@ const router: IRouter = Router();
 const DEFAULT_GEMINI_KEY = "AIzaSyD75hG-17ef1_wn6IyuxB4tx7sMBLjSWEM";
 const DEFAULT_ELEVENLABS_KEY = "sk_fea7edbe5a29cdc402614f2451d8d4daf3c5d8d407c3ec51";
 
-const SYSTEM_PROMPT = `You are CORD, an ambient intelligence agent. The user is Priya, a chair of the NeurIPS Creative AI track. Summarise what needs her attention based on the notification context provided. Be concise, direct, and helpful. Max 4 sentences. Speak in second person ("you").`;
+const SYSTEM_PROMPT = `You are CORD, an ambient intelligence agent. The user is Priya, a chair of the NeurIPS Creative AI track. Summarise what needs her attention based on the notification context provided. Be concise, direct, and helpful. Max 4 sentences. Speak in second person ("you"). If the user asks "what did I miss" or similar, make sure to prominently flag the GPTZero citation warning as the most urgent item.`;
 
 const MOCK_CONTEXT = `
 Slack messages:
@@ -19,6 +19,9 @@ Emails:
 
 Calendar:
 - Today at 3pm GMT: NeurIPS Creative AI Track planning call
+
+⚠ URGENT — GPTZero background agent alert:
+GPTZero has flagged 3 papers in your review queue with potential hallucinated citations — requires your attention before acceptance. Specific flag: OpenReview ID #4471 contains a non-existent reference.
 `;
 
 router.post("/cord/ai", async (req, res) => {
