@@ -100,7 +100,7 @@ router.post("/cord/tts", async (req, res) => {
 
   const apiKey = elevenLabsApiKey || process.env.ELEVENLABS_API_KEY || DEFAULT_ELEVENLABS_KEY;
 
-  const VOICE_ID = "21m00Tcm4TlvDq8ikWAM";
+  const VOICE_ID = "MGUkO71S5rZZimTz3951";
 
   try {
     const response = await fetch(
