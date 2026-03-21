@@ -46,7 +46,7 @@ const NOTIFICATIONS: Omit<Bubble, "id" | "left" | "top">[] = [
 
 const BUBBLE_DURATION = 6000;
 
-let bubbleIdCounter = 0;
+const makeBubbleId = () => Date.now() * 1000 + Math.floor(Math.random() * 1000);
 
 const SCAN_SEQUENCE = [
   "↓ SCANNING SLACK...",
@@ -96,7 +96,7 @@ export default function CordScreen() {
       const streamCenter = notif.streamIdx * 20 + 10;
       const left = streamCenter + (Math.random() * 10 - 5);
       const top = 8 + Math.random() * 55;
-      const id = bubbleIdCounter++;
+      const id = makeBubbleId();
       const bubble: Bubble = { id, left, top, ...notif };
       setBubbles((prev) => [...prev, bubble]);
       const t = setTimeout(() => {
@@ -349,38 +349,63 @@ export default function CordScreen() {
         setAiResponse(responseText);
         setUiState("speaking");
 
-        const ttsRes = await fetch("/api/cord/tts", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: responseText }),
-        });
-
-        const ttsData = (await ttsRes.json()) as {
-          audioBase64?: string;
-          contentType?: string;
-          message?: string;
-        };
-
-        if (!ttsRes.ok) throw new Error(ttsData.message || "TTS request failed");
-
-        const { audioBase64, contentType } = ttsData;
-        if (!audioBase64 || !contentType) throw new Error("No audio data received");
-
-        const bytes = Uint8Array.from(atob(audioBase64), (c) => c.charCodeAt(0));
-        const blob = new Blob([bytes], { type: contentType });
-        const url = URL.createObjectURL(blob);
-        const audio = new Audio(url);
-        audioRef.current = audio;
-
-        audio.onended = () => {
-          URL.revokeObjectURL(url);
+        const onSpeechEnd = () => {
           slowedRef.current = false;
           setUiState("idle");
           setAiResponse("");
           clearLog();
         };
 
-        await audio.play();
+        const speakWithBrowser = () => {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(responseText);
+          utterance.lang = "en-US";
+          utterance.rate = 0.92;
+          utterance.pitch = 1.0;
+          utterance.onend = onSpeechEnd;
+          utterance.onerror = onSpeechEnd;
+          window.speechSynthesis.speak(utterance);
+        };
+
+        let elevenLabsOk = false;
+        try {
+          const ttsRes = await fetch("/api/cord/tts", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: responseText }),
+          });
+
+          if (ttsRes.ok) {
+            const ttsData = (await ttsRes.json()) as {
+              audioBase64?: string;
+              contentType?: string;
+            };
+            const { audioBase64, contentType } = ttsData;
+            if (audioBase64 && contentType) {
+              const bytes = Uint8Array.from(atob(audioBase64), (c) => c.charCodeAt(0));
+              const blob = new Blob([bytes], { type: contentType });
+              const url = URL.createObjectURL(blob);
+              const audio = new Audio(url);
+              audioRef.current = audio;
+              audio.onended = () => {
+                URL.revokeObjectURL(url);
+                onSpeechEnd();
+              };
+              audio.onerror = () => {
+                URL.revokeObjectURL(url);
+                speakWithBrowser();
+              };
+              await audio.play();
+              elevenLabsOk = true;
+            }
+          }
+        } catch {
+          // ElevenLabs failed — fall through to browser synthesis
+        }
+
+        if (!elevenLabsOk) {
+          speakWithBrowser();
+        }
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Unknown error";
         setError(msg);
@@ -425,6 +450,7 @@ export default function CordScreen() {
       audioRef.current.pause();
       audioRef.current = null;
     }
+    window.speechSynthesis?.cancel();
     clearScanTimers();
     slowedRef.current = false;
     setUiState("idle");
