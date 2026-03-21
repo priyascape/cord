@@ -1,6 +1,8 @@
 # cord
 Ambient intelligence screensaver agent. Ask "what did I miss?" and Gemini briefs you across Slack, Gmail, Calendar and OpenReview. Built at Cerebral Valley × Vercel × DeepMind Hackathon London 2026
 
+https://ambient-agent.replit.app/
+
 Every time you step away from your desk, intelligence accumulates — Slack messages, emails, calendar reminders, paper submissions, flagged anomalies. 
 
 But when you return, you face a wall of notifications across fragmented surfaces. CORD is an ambient intelligence screensaver agent that reads everything while you're gone and briefs you the moment you're back.
