@@ -26,6 +26,28 @@ interface LogLine {
   key: number;
 }
 
+interface Bubble {
+  id: number;
+  streamIdx: number;
+  label: string;
+  icon: string;
+  text: string;
+  left: number;
+  top: number;
+}
+
+const NOTIFICATIONS: Omit<Bubble, "id" | "left" | "top">[] = [
+  { streamIdx: 0, label: "SLACK", icon: "◉", text: "Terri: travel grant doc needs sign-off" },
+  { streamIdx: 1, label: "GMAIL", icon: "✉", text: "14 new paper submissions in review queue" },
+  { streamIdx: 2, label: "CALENDAR", icon: "◈", text: "NeurIPS Creative AI call — 3pm today" },
+  { streamIdx: 0, label: "SLACK", icon: "◉", text: "Creative AI schedule needed by EOD" },
+  { streamIdx: 1, label: "GMAIL", icon: "✉", text: "AV setup confirmation pending — Max" },
+];
+
+const BUBBLE_DURATION = 5000;
+
+let bubbleIdCounter = 0;
+
 const SCAN_SEQUENCE = [
   "↓ SCANNING SLACK...",
   "↓ SCANNING GMAIL...",
@@ -48,12 +70,39 @@ export default function CordScreen() {
   const [aiResponse, setAiResponse] = useState("");
   const [error, setError] = useState("");
 
+  const [bubbles, setBubbles] = useState<Bubble[]>([]);
+
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const scanTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const logLinesRef = useRef<LogLine[]>([]);
   const uiStateRef = useRef(uiState);
   uiStateRef.current = uiState;
+  const notifIndexRef = useRef(0);
+
+  useEffect(() => {
+    const spawnBubble = () => {
+      if (uiStateRef.current !== "idle") return;
+      const notif = NOTIFICATIONS[notifIndexRef.current % NOTIFICATIONS.length];
+      notifIndexRef.current += 1;
+      const streamCenter = notif.streamIdx * 20 + 10;
+      const left = streamCenter + (Math.random() * 8 - 4);
+      const top = 12 + Math.random() * 38;
+      const id = bubbleIdCounter++;
+      const bubble: Bubble = { id, left, top, ...notif };
+      setBubbles((prev) => [...prev, bubble]);
+      setTimeout(() => {
+        setBubbles((prev) => prev.filter((b) => b.id !== id));
+      }, BUBBLE_DURATION);
+    };
+
+    const interval = setInterval(spawnBubble, 3500);
+    const initial = setTimeout(spawnBubble, 800);
+    return () => {
+      clearInterval(interval);
+      clearTimeout(initial);
+    };
+  }, []);
 
   const addLog = useCallback((text: string) => {
     logLinesRef.current = logLinesRef.current.map((l) => ({ ...l, dim: true }));
@@ -380,6 +429,26 @@ export default function CordScreen() {
   return (
     <div className="cord-root">
       <canvas ref={canvasRef} className="cord-canvas" />
+
+      <div className="bubbles-layer">
+        {bubbles.map((b) => (
+          <div
+            key={b.id}
+            className="bubble-wrap"
+            style={{ left: `${b.left}%`, top: `${b.top}%` }}
+          >
+            <div className="bubble-dot" />
+            <div className="bubble-card">
+              <div className="bubble-header">
+                <span className="bubble-icon">{b.icon}</span>
+                <span className="bubble-label">{b.label}</span>
+                <span className="bubble-cursor">_</span>
+              </div>
+              <div className="bubble-text">{b.text}</div>
+            </div>
+          </div>
+        ))}
+      </div>
 
       {logLines.length > 0 && (
         <div className="cord-terminal">
