@@ -287,7 +287,17 @@ export default function CordScreen() {
     };
 
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      setError(`Speech error: ${event.error}`);
+      if (event.error === "no-speech" || event.error === "aborted") {
+        slowedRef.current = false;
+        setUiState("idle");
+        setStatusMsg("");
+        return;
+      }
+      if (event.error === "not-allowed") {
+        setError("Microphone access denied. Please allow microphone permissions and try again.");
+      } else {
+        setError(`Speech error: ${event.error}`);
+      }
       slowedRef.current = false;
       setUiState("idle");
       setStatusMsg("");
