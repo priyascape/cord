@@ -159,12 +159,12 @@ html, body, #root {
 .bubble-wrap {
   position: absolute;
   transform: translateX(-50%);
-  animation: bubble-wrap-life 6s ease forwards;
+  animation: bubble-wrap-life 8s ease forwards;
 }
 
 @keyframes bubble-wrap-life {
   0%   { opacity: 1; }
-  85%  { opacity: 1; }
+  88%  { opacity: 1; }
   100% { opacity: 0; }
 }
 
@@ -177,14 +177,14 @@ html, body, #root {
   border-radius: 50%;
   background: #00ff41;
   box-shadow: 0 0 8px #00ff41, 0 0 16px rgba(0, 255, 65, 0.5);
-  animation: dot-rise 6s ease forwards;
+  animation: dot-rise 8s ease forwards;
 }
 
 @keyframes dot-rise {
   0%   { bottom: -180px; opacity: 0; }
-  6%   { bottom: -180px; opacity: 1; }
-  30%  { bottom: 14px;   opacity: 1; }
-  78%  { bottom: 14px;   opacity: 0.7; }
+  5%   { bottom: -180px; opacity: 1; }
+  24%  { bottom: 14px;   opacity: 1; }
+  80%  { bottom: 14px;   opacity: 0.7; }
   100% { bottom: 14px;   opacity: 0; }
 }
 
@@ -195,14 +195,14 @@ html, body, #root {
   padding: 8px 12px;
   min-width: 190px;
   max-width: 230px;
-  animation: card-appear 6s ease forwards;
+  animation: card-appear 8s ease forwards;
 }
 
 @keyframes card-appear {
   0%   { opacity: 0; transform: translateY(6px) scale(0.96); }
-  22%  { opacity: 0; transform: translateY(6px) scale(0.96); }
-  34%  { opacity: 1; transform: translateY(0)   scale(1); }
-  80%  { opacity: 1; transform: translateY(0)   scale(1); }
+  18%  { opacity: 0; transform: translateY(6px) scale(0.96); }
+  28%  { opacity: 1; transform: translateY(0)   scale(1); }
+  78%  { opacity: 1; transform: translateY(0)   scale(1); }
   100% { opacity: 0; transform: translateY(-3px) scale(0.98); }
 }
 

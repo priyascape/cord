@@ -38,18 +38,18 @@ interface Bubble {
   duration?: number;
 }
 
-const DEFAULT_BUBBLE_DURATION = 6000;
-const WARNING_BUBBLE_DURATION = 9500;
+const DEFAULT_BUBBLE_DURATION = 8000;
+const WARNING_BUBBLE_DURATION = 10000;
 
 const NOTIFICATIONS: Omit<Bubble, "id" | "left" | "top">[] = [
-  { streamIdx: 0, label: "SLACK",    icon: "◉", text: "Terri: travel grant doc needs sign-off" },
-  { streamIdx: 1, label: "GMAIL",    icon: "✉", text: "14 new paper submissions in review queue" },
-  { streamIdx: 2, label: "CALENDAR", icon: "◈", text: "NeurIPS Creative AI call — 3pm today" },
-  { streamIdx: 0, label: "SLACK",    icon: "◉", text: "Creative AI schedule needed by EOD" },
-  { streamIdx: 1, label: "GMAIL",    icon: "✉", text: "AV setup confirmation pending — Max" },
+  { streamIdx: 0, label: "NEURIPS SLACK AGENT", icon: "◉", text: "Terri: travel grant doc needs sign-off" },
+  { streamIdx: 1, label: "GMAIL NEURIPS AGENT", icon: "✉", text: "14 new paper submissions in review queue" },
+  { streamIdx: 2, label: "CALENDAR",            icon: "◈", text: "NeurIPS Creative AI call — 3pm today" },
+  { streamIdx: 0, label: "NEURIPS SLACK AGENT", icon: "◉", text: "Creative AI schedule needed by EOD" },
+  { streamIdx: 1, label: "GMAIL NEURIPS AGENT", icon: "✉", text: "AV setup confirmation pending — Max" },
   {
     streamIdx: 3,
-    label: "GPTZERO",
+    label: "GPTZERO AGENT",
     icon: "⚠",
     text: "Hallucinated citation detected: OpenReview ID #4471 — non-existent reference found",
     warning: true,
@@ -499,8 +499,14 @@ export default function CordScreen() {
             className="bubble-wrap"
             style={{ left: `${b.left}%`, top: `${b.top}%` }}
           >
-            <div className="bubble-dot" />
-            <div className={`bubble-card${b.warning ? " bubble-card--warning" : ""}`}>
+            <div
+              className="bubble-dot"
+              style={b.warning ? { animationDuration: "10s" } : undefined}
+            />
+            <div
+              className={`bubble-card${b.warning ? " bubble-card--warning" : ""}`}
+              style={b.warning ? { animationDuration: "10s" } : undefined}
+            >
               <div className="bubble-header">
                 <span className={`bubble-icon${b.warning ? " bubble-icon--warning" : ""}`}>{b.icon}</span>
                 <span className={`bubble-label${b.warning ? " bubble-label--warning" : ""}`}>{b.label}</span>
