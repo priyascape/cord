@@ -2,6 +2,8 @@ Ambient intelligence screensaver agent. Ask "what did I miss?" and Gemini briefs
 
 https://ambient-agent.replit.app/
 
+https://www.loom.com/share/fb89e2991e244c488fafc57399bd68bf
+
 Every time you step away from your desk, intelligence accumulates — Slack messages, emails, calendar reminders, paper submissions, flagged anomalies.
 
 But when you return, you face a wall of notifications across fragmented surfaces. CORD is an ambient intelligence screensaver agent that reads everything while you're gone and briefs you the moment you're back.
