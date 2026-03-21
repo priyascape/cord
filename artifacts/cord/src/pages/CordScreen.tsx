@@ -395,13 +395,29 @@ export default function CordScreen() {
 
         const speakWithBrowser = () => {
           window.speechSynthesis.cancel();
-          const utterance = new SpeechSynthesisUtterance(responseText);
-          utterance.lang = "en-US";
-          utterance.rate = 0.92;
-          utterance.pitch = 1.0;
-          utterance.onend = onSpeechEnd;
-          utterance.onerror = onSpeechEnd;
-          window.speechSynthesis.speak(utterance);
+          // Chrome silently truncates long utterances (~200 chars). Split into
+          // sentences and chain them so the full message always plays through.
+          const chunks = responseText.match(/[^.!?]+[.!?]+[\s]*/g) ?? [responseText];
+          let idx = 0;
+          // Keep-alive: Chrome pauses synthesis when the tab loses focus
+          const keepAlive = setInterval(() => {
+            if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+          }, 5000);
+          const speakChunk = () => {
+            if (idx >= chunks.length) {
+              clearInterval(keepAlive);
+              onSpeechEnd();
+              return;
+            }
+            const u = new SpeechSynthesisUtterance(chunks[idx++].trim());
+            u.lang = "en-US";
+            u.rate = 0.92;
+            u.pitch = 1.0;
+            u.onend = speakChunk;
+            u.onerror = () => { clearInterval(keepAlive); onSpeechEnd(); };
+            window.speechSynthesis.speak(u);
+          };
+          speakChunk();
         };
 
         let elevenLabsOk = false;
