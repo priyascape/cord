@@ -2,6 +2,9 @@ import { Router, type IRouter } from "express";
 
 const router: IRouter = Router();
 
+const DEFAULT_GEMINI_KEY = "AIzaSyD75hG-17ef1_wn6IyuxB4tx7sMBLjSWEM";
+const DEFAULT_ELEVENLABS_KEY = "sk_fea7edbe5a29cdc402614f2451d8d4daf3c5d8d407c3ec51";
+
 const SYSTEM_PROMPT = `You are CORD, an ambient intelligence agent. The user has returned to their desk. Summarise what needs their attention across: 3 Slack messages, 2 emails, 1 calendar reminder. Be concise. Max 4 sentences.`;
 
 const MOCK_CONTEXT = `
@@ -29,15 +32,7 @@ router.post("/cord/ai", async (req, res) => {
     return;
   }
 
-  const apiKey = geminiApiKey || process.env.GEMINI_API_KEY;
-
-  if (!apiKey) {
-    res.status(400).json({
-      error: "no_api_key",
-      message: "No Gemini API key configured. Please add one in the top-right input or set GEMINI_API_KEY env var.",
-    });
-    return;
-  }
+  const apiKey = geminiApiKey || process.env.GEMINI_API_KEY || DEFAULT_GEMINI_KEY;
 
   try {
     const response = await fetch(
@@ -100,15 +95,7 @@ router.post("/cord/tts", async (req, res) => {
     return;
   }
 
-  const apiKey = elevenLabsApiKey || process.env.ELEVENLABS_API_KEY;
-
-  if (!apiKey) {
-    res.status(400).json({
-      error: "no_api_key",
-      message: "No ElevenLabs API key configured. Please add one in the top-right input or set ELEVENLABS_API_KEY env var.",
-    });
-    return;
-  }
+  const apiKey = elevenLabsApiKey || process.env.ELEVENLABS_API_KEY || DEFAULT_ELEVENLABS_KEY;
 
   const VOICE_ID = "21m00Tcm4TlvDq8ikWAM";
 

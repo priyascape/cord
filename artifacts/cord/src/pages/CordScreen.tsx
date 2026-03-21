@@ -30,19 +30,12 @@ export default function CordScreen() {
   const [transcript, setTranscript] = useState("");
   const [aiResponse, setAiResponse] = useState("");
   const [statusMsg, setStatusMsg] = useState("");
-  const [geminiKey, setGeminiKey] = useState("");
-  const [elevenLabsKey, setElevenLabsKey] = useState("");
-  const [showKeys, setShowKeys] = useState(false);
   const [error, setError] = useState("");
 
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const uiStateRef = useRef(uiState);
   uiStateRef.current = uiState;
-  const geminiKeyRef = useRef(geminiKey);
-  geminiKeyRef.current = geminiKey;
-  const elevenLabsKeyRef = useRef(elevenLabsKey);
-  elevenLabsKeyRef.current = elevenLabsKey;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -228,10 +221,7 @@ export default function CordScreen() {
         const aiRes = await fetch("/api/cord/ai", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            transcript: text,
-            geminiApiKey: geminiKeyRef.current || undefined,
-          }),
+          body: JSON.stringify({ transcript: text }),
         });
 
         const aiData = (await aiRes.json()) as { response?: string; message?: string };
@@ -245,10 +235,7 @@ export default function CordScreen() {
         const ttsRes = await fetch("/api/cord/tts", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            text: responseText,
-            elevenLabsApiKey: elevenLabsKeyRef.current || undefined,
-          }),
+          body: JSON.stringify({ text: responseText }),
         });
 
         const ttsData = (await ttsRes.json()) as {
@@ -338,34 +325,6 @@ export default function CordScreen() {
   return (
     <div className="cord-root">
       <canvas ref={canvasRef} className="cord-canvas" />
-
-      <div className="cord-top-right">
-        <button className="keys-toggle" onClick={() => setShowKeys((v) => !v)}>
-          ⚙ KEYS
-        </button>
-        {showKeys && (
-          <div className="keys-panel">
-            <div className="keys-label">GEMINI API KEY</div>
-            <input
-              className="keys-input"
-              type="password"
-              placeholder="AIzaSy..."
-              value={geminiKey}
-              onChange={(e) => setGeminiKey(e.target.value)}
-            />
-            <div className="keys-label" style={{ marginTop: 8 }}>
-              ELEVENLABS API KEY
-            </div>
-            <input
-              className="keys-input"
-              type="password"
-              placeholder="sk_..."
-              value={elevenLabsKey}
-              onChange={(e) => setElevenLabsKey(e.target.value)}
-            />
-          </div>
-        )}
-      </div>
 
       {statusMsg && (
         <div className="cord-status">
