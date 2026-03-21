@@ -20,6 +20,22 @@ interface Drop {
   isLabel: boolean;
 }
 
+interface LogLine {
+  text: string;
+  dim: boolean;
+  key: number;
+}
+
+const SCAN_SEQUENCE = [
+  "↓ SCANNING SLACK...",
+  "↓ SCANNING GMAIL...",
+  "↓ SCANNING DROPBOX...",
+  "↓ SCANNING CALENDAR...",
+  "SYNTHESISING WITH GEMINI...",
+];
+
+let keyCounter = 0;
+
 export default function CordScreen() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const slowedRef = useRef(false);
@@ -27,15 +43,33 @@ export default function CordScreen() {
   const animRef = useRef<number>(0);
 
   const [uiState, setUiState] = useState<"idle" | "listening" | "processing" | "speaking">("idle");
+  const [logLines, setLogLines] = useState<LogLine[]>([]);
   const [transcript, setTranscript] = useState("");
   const [aiResponse, setAiResponse] = useState("");
-  const [statusMsg, setStatusMsg] = useState("");
   const [error, setError] = useState("");
 
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const scanTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const logLinesRef = useRef<LogLine[]>([]);
   const uiStateRef = useRef(uiState);
   uiStateRef.current = uiState;
+
+  const addLog = useCallback((text: string) => {
+    logLinesRef.current = logLinesRef.current.map((l) => ({ ...l, dim: true }));
+    logLinesRef.current = [...logLinesRef.current, { text, dim: false, key: keyCounter++ }];
+    setLogLines([...logLinesRef.current]);
+  }, []);
+
+  const clearLog = useCallback(() => {
+    logLinesRef.current = [];
+    setLogLines([]);
+  }, []);
+
+  const clearScanTimers = useCallback(() => {
+    scanTimersRef.current.forEach(clearTimeout);
+    scanTimersRef.current = [];
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -185,15 +219,32 @@ export default function CordScreen() {
     };
   }, []);
 
+  const runScanSequence = useCallback((): Promise<void> => {
+    return new Promise((resolve) => {
+      SCAN_SEQUENCE.forEach((line, i) => {
+        const t = setTimeout(() => {
+          addLog(line);
+          if (i === SCAN_SEQUENCE.length - 1) {
+            const final = setTimeout(resolve, 400);
+            scanTimersRef.current.push(final);
+          }
+        }, (i + 1) * 500);
+        scanTimersRef.current.push(t);
+      });
+    });
+  }, [addLog]);
+
   const handleMicClick = useCallback(async () => {
     if (uiStateRef.current !== "idle") return;
 
     setError("");
     setAiResponse("");
     setTranscript("");
+    clearLog();
+    clearScanTimers();
     slowedRef.current = true;
     setUiState("listening");
-    setStatusMsg("LISTENING...");
+    addLog("LISTENING...");
 
     const SR =
       (window as Window).SpeechRecognition || (window as Window).webkitSpeechRecognition;
@@ -202,6 +253,7 @@ export default function CordScreen() {
       setError("Web Speech API not supported in this browser.");
       slowedRef.current = false;
       setUiState("idle");
+      clearLog();
       return;
     }
 
@@ -215,22 +267,23 @@ export default function CordScreen() {
       const text = event.results[0][0].transcript;
       setTranscript(text);
       setUiState("processing");
-      setStatusMsg("PROCESSING...");
+      addLog("PROCESSING...");
 
       try {
-        const aiRes = await fetch("/api/cord/ai", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ transcript: text }),
-        });
+        const [aiData] = await Promise.all([
+          fetch("/api/cord/ai", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ transcript: text }),
+          }).then((r) => r.json() as Promise<{ response?: string; message?: string }>),
+          runScanSequence(),
+        ]);
 
-        const aiData = (await aiRes.json()) as { response?: string; message?: string };
-        if (!aiRes.ok) throw new Error(aiData.message || "AI request failed");
+        if (!aiData.response) throw new Error(aiData.message || "AI request failed");
 
-        const responseText = aiData.response ?? "";
+        const responseText = aiData.response;
         setAiResponse(responseText);
         setUiState("speaking");
-        setStatusMsg("SPEAKING...");
 
         const ttsRes = await fetch("/api/cord/tts", {
           method: "POST",
@@ -259,8 +312,8 @@ export default function CordScreen() {
           URL.revokeObjectURL(url);
           slowedRef.current = false;
           setUiState("idle");
-          setStatusMsg("");
           setAiResponse("");
+          clearLog();
         };
 
         await audio.play();
@@ -269,7 +322,8 @@ export default function CordScreen() {
         setError(msg);
         slowedRef.current = false;
         setUiState("idle");
-        setStatusMsg("");
+        clearLog();
+        clearScanTimers();
       }
     };
 
@@ -277,7 +331,7 @@ export default function CordScreen() {
       if (event.error === "no-speech" || event.error === "aborted") {
         slowedRef.current = false;
         setUiState("idle");
-        setStatusMsg("");
+        clearLog();
         return;
       }
       if (event.error === "not-allowed") {
@@ -287,19 +341,19 @@ export default function CordScreen() {
       }
       slowedRef.current = false;
       setUiState("idle");
-      setStatusMsg("");
+      clearLog();
     };
 
     recognition.onend = () => {
       if (uiStateRef.current === "listening") {
         slowedRef.current = false;
         setUiState("idle");
-        setStatusMsg("");
+        clearLog();
       }
     };
 
     recognition.start();
-  }, []);
+  }, [addLog, clearLog, clearScanTimers, runScanSequence]);
 
   const handleStop = useCallback(() => {
     recognitionRef.current?.stop();
@@ -307,13 +361,14 @@ export default function CordScreen() {
       audioRef.current.pause();
       audioRef.current = null;
     }
+    clearScanTimers();
     slowedRef.current = false;
     setUiState("idle");
-    setStatusMsg("");
     setAiResponse("");
     setTranscript("");
     setError("");
-  }, []);
+    clearLog();
+  }, [clearLog, clearScanTimers]);
 
   const micClass = () => {
     if (uiState === "listening") return "mic-btn mic-listening";
@@ -326,9 +381,16 @@ export default function CordScreen() {
     <div className="cord-root">
       <canvas ref={canvasRef} className="cord-canvas" />
 
-      {statusMsg && (
-        <div className="cord-status">
-          <span className="cord-status-text">{statusMsg}</span>
+      {logLines.length > 0 && (
+        <div className="cord-terminal">
+          {logLines.map((line) => (
+            <div
+              key={line.key}
+              className={`cord-terminal-line ${line.dim ? "cord-terminal-line--dim" : "cord-terminal-line--active"} ${line.text === "LISTENING..." ? "cord-terminal-line--pulse" : ""}`}
+            >
+              {line.text}
+            </div>
+          ))}
         </div>
       )}
 
@@ -338,7 +400,7 @@ export default function CordScreen() {
         </div>
       )}
 
-      {aiResponse && (uiState === "speaking" || uiState === "processing") && (
+      {aiResponse && uiState === "speaking" && (
         <div className="cord-response">
           <div className="cord-response-label">▶ CORD</div>
           <div className="cord-response-text">{aiResponse}</div>

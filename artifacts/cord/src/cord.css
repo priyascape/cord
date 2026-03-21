@@ -99,26 +99,53 @@ html, body, #root {
   color: rgba(0, 255, 65, 0.25);
 }
 
-/* ── Status ──────────────────────────────────────────── */
-.cord-status {
+/* ── Terminal log ────────────────────────────────────── */
+.cord-terminal {
   position: fixed;
-  top: 20px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
   pointer-events: none;
+  min-width: 340px;
 }
 
-.cord-status-text {
-  font-size: 13px;
-  letter-spacing: 0.3em;
-  color: rgba(0, 255, 65, 0.9);
-  text-shadow: 0 0 10px rgba(0, 255, 65, 0.6);
-  animation: blink-status 1s step-end infinite;
+.cord-terminal-line {
+  font-size: 15px;
+  letter-spacing: 0.18em;
+  font-family: inherit;
+  transition: opacity 0.4s ease, color 0.4s ease, text-shadow 0.4s ease;
+  animation: slide-in 0.25s ease;
 }
 
-@keyframes blink-status {
-  50% { opacity: 0.4; }
+@keyframes slide-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.cord-terminal-line--active {
+  color: #00ff41;
+  text-shadow: 0 0 10px rgba(0, 255, 65, 0.7);
+  opacity: 1;
+}
+
+.cord-terminal-line--dim {
+  color: rgba(0, 255, 65, 0.3);
+  text-shadow: none;
+  opacity: 0.5;
+}
+
+.cord-terminal-line--pulse {
+  animation: slide-in 0.25s ease, terminal-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes terminal-pulse {
+  0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(0, 255, 65, 0.7); }
+  50%       { opacity: 0.5; text-shadow: none; }
 }
 
 /* ── Transcript ──────────────────────────────────────── */
