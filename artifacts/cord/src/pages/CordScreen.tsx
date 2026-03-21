@@ -88,6 +88,8 @@ export default function CordScreen() {
   }, []);
 
   const [bubbles, setBubbles] = useState<Bubble[]>([]);
+  const bubblesRef = useRef<Bubble[]>([]);
+  bubblesRef.current = bubbles;
 
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -97,6 +99,29 @@ export default function CordScreen() {
   uiStateRef.current = uiState;
   const notifIndexRef = useRef(0);
 
+  // Pick a y% that maximises distance from any active bubble in the same or adjacent column
+  const findTop = useCallback((streamIdx: number): number => {
+    const START = 8;
+    const END = 60;
+    const CARD_GAP = 16; // ~16% of screen height clears a card + breathing room
+    const nearby = bubblesRef.current.filter(
+      (b) => Math.abs(b.streamIdx - streamIdx) <= 1
+    );
+    if (nearby.length === 0) return START + Math.random() * (END - START);
+    let bestTop = START;
+    let bestDist = -1;
+    for (let i = 0; i < 20; i++) {
+      const candidate = START + Math.random() * (END - START);
+      const minDist = Math.min(...nearby.map((b) => Math.abs(b.top - candidate)));
+      if (minDist > bestDist) {
+        bestDist = minDist;
+        bestTop = candidate;
+        if (minDist >= CARD_GAP) break;
+      }
+    }
+    return bestTop;
+  }, []);
+
   useEffect(() => {
     const timers: ReturnType<typeof setTimeout>[] = [];
 
@@ -105,8 +130,8 @@ export default function CordScreen() {
       const notif = NOTIFICATIONS[notifIndexRef.current % NOTIFICATIONS.length];
       notifIndexRef.current += 1;
       const streamCenter = notif.streamIdx * 20 + 10;
-      const left = streamCenter + (Math.random() * 10 - 5);
-      const top = 8 + Math.random() * 55;
+      const left = streamCenter + (Math.random() * 8 - 4);
+      const top = findTop(notif.streamIdx);
       const id = makeBubbleId();
       const bubble: Bubble = { id, left, top, ...notif };
       const bubbleDuration = notif.duration ?? DEFAULT_BUBBLE_DURATION;
@@ -129,7 +154,7 @@ export default function CordScreen() {
       clearInterval(interval);
       timers.forEach(clearTimeout);
     };
-  }, []);
+  }, [findTop]);
 
   const addLog = useCallback((text: string) => {
     logLinesRef.current = logLinesRef.current.map((l) => ({ ...l, dim: true }));
