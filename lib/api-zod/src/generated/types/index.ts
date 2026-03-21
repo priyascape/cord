@@ -6,4 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./cordAiRequest";
+export * from "./cordAiResponse";
+export * from "./cordTtsRequest";
+export * from "./cordTtsResponse";
+export * from "./errorResponse";
 export * from "./healthStatus";

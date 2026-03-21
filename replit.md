@@ -16,6 +16,27 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **API codegen**: Orval (from OpenAPI spec)
 - **Build**: esbuild (CJS bundle)
 
+## Artifacts
+
+### `artifacts/cord` — CORD Matrix AI Screensaver
+
+Full-screen Matrix-style AI screensaver agent. Features:
+- Canvas-based Matrix rain animation with falling Katakana/Latin characters
+- 5 notification streams (Slack, Gmail, Calendar, Linear, Dropbox) labeled across columns
+- Column glow bursts every 3-5 seconds simulating new notifications
+- Microphone button triggers Web Speech API for voice input
+- Backend proxies to Gemini API for AI responses
+- Backend proxies to ElevenLabs TTS for voice output
+- API key input panel (top-right) for demo purposes
+- Rain slows/dims during voice interaction; AI response shown as glowing text overlay
+
+Key files:
+- `artifacts/cord/src/pages/CordScreen.tsx` — main component (canvas animation + UI)
+- `artifacts/cord/src/cord.css` — all styles (monospace, matrix green, dark theme)
+- `artifacts/api-server/src/routes/cord.ts` — Gemini + ElevenLabs API proxy routes
+
+Environment variables used: `GEMINI_API_KEY`, `ELEVENLABS_API_KEY`
+
 ## Structure
 
 ```text

@@ -1,0 +1,311 @@
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: 'Share Tech Mono', 'Courier New', monospace;
+  color: #00ff41;
+}
+
+.cord-root {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #000;
+}
+
+.cord-canvas {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Top-right API key panel ───────────────────────── */
+.cord-top-right {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.keys-toggle {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(0, 255, 65, 0.4);
+  color: rgba(0, 255, 65, 0.7);
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.keys-toggle:hover {
+  border-color: #00ff41;
+  color: #00ff41;
+  box-shadow: 0 0 8px rgba(0, 255, 65, 0.3);
+}
+
+.keys-panel {
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid rgba(0, 255, 65, 0.3);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 240px;
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+}
+
+.keys-label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: rgba(0, 255, 65, 0.6);
+}
+
+.keys-input {
+  background: rgba(0, 255, 65, 0.05);
+  border: 1px solid rgba(0, 255, 65, 0.25);
+  color: #00ff41;
+  font-family: inherit;
+  font-size: 12px;
+  padding: 6px 8px;
+  width: 100%;
+  outline: none;
+  letter-spacing: 0.05em;
+}
+
+.keys-input:focus {
+  border-color: rgba(0, 255, 65, 0.6);
+  box-shadow: 0 0 6px rgba(0, 255, 65, 0.2);
+}
+
+.keys-input::placeholder {
+  color: rgba(0, 255, 65, 0.25);
+}
+
+/* ── Status ──────────────────────────────────────────── */
+.cord-status {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  pointer-events: none;
+}
+
+.cord-status-text {
+  font-size: 13px;
+  letter-spacing: 0.3em;
+  color: rgba(0, 255, 65, 0.9);
+  text-shadow: 0 0 10px rgba(0, 255, 65, 0.6);
+  animation: blink-status 1s step-end infinite;
+}
+
+@keyframes blink-status {
+  50% { opacity: 0.4; }
+}
+
+/* ── Transcript ──────────────────────────────────────── */
+.cord-transcript {
+  position: fixed;
+  bottom: 160px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  max-width: 600px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.cord-transcript-text {
+  font-size: 14px;
+  color: rgba(0, 255, 65, 0.55);
+  letter-spacing: 0.06em;
+  font-style: italic;
+}
+
+/* ── AI Response ─────────────────────────────────────── */
+.cord-response {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  max-width: 680px;
+  width: 90%;
+  background: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(0, 255, 65, 0.35);
+  padding: 28px 32px;
+  pointer-events: none;
+  box-shadow: 0 0 40px rgba(0, 255, 65, 0.12), inset 0 0 20px rgba(0, 0, 0, 0.5);
+  animation: fade-in-response 0.4s ease;
+}
+
+@keyframes fade-in-response {
+  from { opacity: 0; transform: translate(-50%, -48%); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+.cord-response-label {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: rgba(0, 255, 65, 0.5);
+  margin-bottom: 14px;
+}
+
+.cord-response-text {
+  font-size: 18px;
+  line-height: 1.6;
+  color: #00ff41;
+  text-shadow: 0 0 8px rgba(0, 255, 65, 0.4);
+  letter-spacing: 0.03em;
+}
+
+/* ── Error ───────────────────────────────────────────── */
+.cord-error {
+  position: fixed;
+  bottom: 180px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid rgba(255, 50, 50, 0.5);
+  color: rgba(255, 80, 80, 0.9);
+  font-size: 12px;
+  padding: 10px 16px;
+  letter-spacing: 0.06em;
+  max-width: 500px;
+}
+
+.cord-error-dismiss {
+  background: none;
+  border: none;
+  color: rgba(255, 80, 80, 0.7);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  font-family: inherit;
+}
+
+/* ── Microphone button ───────────────────────────────── */
+.cord-mic-area {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.mic-btn {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 255, 65, 0.6);
+  background: rgba(0, 0, 0, 0.7);
+  color: #00ff41;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-family: inherit;
+  transition: all 0.25s;
+  backdrop-filter: blur(4px);
+}
+
+.mic-btn:hover {
+  border-color: #00ff41;
+  box-shadow: 0 0 24px rgba(0, 255, 65, 0.5), 0 0 60px rgba(0, 255, 65, 0.15);
+  transform: scale(1.05);
+}
+
+.mic-idle {
+  box-shadow: 0 0 12px rgba(0, 255, 65, 0.2);
+}
+
+.mic-listening {
+  border-color: #00ff41;
+  animation: pulse-listen 1s ease-in-out infinite;
+}
+
+@keyframes pulse-listen {
+  0%, 100% { box-shadow: 0 0 12px rgba(0, 255, 65, 0.4); }
+  50% { box-shadow: 0 0 30px rgba(0, 255, 65, 0.8), 0 0 60px rgba(0, 255, 65, 0.3); }
+}
+
+.mic-processing {
+  border-color: rgba(0, 200, 255, 0.7);
+  color: rgba(0, 200, 255, 0.9);
+  animation: spin-process 2s linear infinite;
+}
+
+@keyframes spin-process {
+  0% { box-shadow: 0 0 12px rgba(0, 200, 255, 0.3); }
+  50% { box-shadow: 0 0 24px rgba(0, 200, 255, 0.6); }
+  100% { box-shadow: 0 0 12px rgba(0, 200, 255, 0.3); }
+}
+
+.mic-speaking {
+  border-color: rgba(57, 255, 20, 0.9);
+  animation: pulse-speak 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-speak {
+  from { box-shadow: 0 0 12px rgba(57, 255, 20, 0.4), 0 0 30px rgba(57, 255, 20, 0.2); }
+  to { box-shadow: 0 0 30px rgba(57, 255, 20, 0.9), 0 0 60px rgba(57, 255, 20, 0.4); }
+}
+
+.mic-stop {
+  border-color: rgba(255, 80, 80, 0.6);
+  color: rgba(255, 80, 80, 0.9);
+  font-size: 20px;
+}
+
+.mic-stop:hover {
+  border-color: rgba(255, 80, 80, 0.9);
+  box-shadow: 0 0 20px rgba(255, 80, 80, 0.4);
+}
+
+.cord-mic-label {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: rgba(0, 255, 65, 0.5);
+  text-transform: uppercase;
+}
+
+/* ── Wordmark ─────────────────────────────────────────── */
+.cord-wordmark {
+  position: fixed;
+  top: 20px;
+  left: 24px;
+  z-index: 100;
+  font-size: 22px;
+  letter-spacing: 0.5em;
+  color: rgba(0, 255, 65, 0.35);
+  text-shadow: 0 0 10px rgba(0, 255, 65, 0.15);
+  pointer-events: none;
+  font-weight: normal;
+}

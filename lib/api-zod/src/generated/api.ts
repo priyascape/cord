@@ -14,3 +14,36 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * Sends transcript to Gemini and returns the AI response
+ * @summary Query CORD AI agent
+ */
+export const CordAiQueryBody = zod.object({
+  transcript: zod.string().describe("The user's spoken transcript"),
+  geminiApiKey: zod
+    .string()
+    .optional()
+    .describe("Optional Gemini API key override (for demo purposes)"),
+});
+
+export const CordAiQueryResponse = zod.object({
+  response: zod.string().describe("The AI agent's response text"),
+});
+
+/**
+ * Sends text to ElevenLabs TTS and returns audio data
+ * @summary Convert text to speech
+ */
+export const CordTtsBody = zod.object({
+  text: zod.string().describe("Text to convert to speech"),
+  elevenLabsApiKey: zod
+    .string()
+    .optional()
+    .describe("Optional ElevenLabs API key override (for demo purposes)"),
+});
+
+export const CordTtsResponse = zod.object({
+  audioBase64: zod.string().describe("Base64-encoded audio data (MP3)"),
+  contentType: zod.string().describe("Audio content type"),
+});

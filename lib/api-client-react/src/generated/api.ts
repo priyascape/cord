@@ -5,18 +5,28 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { HealthStatus } from "./api.schemas";
+import type {
+  CordAiRequest,
+  CordAiResponse,
+  CordTtsRequest,
+  CordTtsResponse,
+  ErrorResponse,
+  HealthStatus,
+} from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
-import type { ErrorType } from "../custom-fetch";
+import type { ErrorType, BodyType } from "../custom-fetch";
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -99,3 +109,177 @@ export function useHealthCheck<
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
+
+/**
+ * Sends transcript to Gemini and returns the AI response
+ * @summary Query CORD AI agent
+ */
+export const getCordAiQueryUrl = () => {
+  return `/api/cord/ai`;
+};
+
+export const cordAiQuery = async (
+  cordAiRequest: CordAiRequest,
+  options?: RequestInit,
+): Promise<CordAiResponse> => {
+  return customFetch<CordAiResponse>(getCordAiQueryUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(cordAiRequest),
+  });
+};
+
+export const getCordAiQueryMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof cordAiQuery>>,
+    TError,
+    { data: BodyType<CordAiRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof cordAiQuery>>,
+  TError,
+  { data: BodyType<CordAiRequest> },
+  TContext
+> => {
+  const mutationKey = ["cordAiQuery"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof cordAiQuery>>,
+    { data: BodyType<CordAiRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return cordAiQuery(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CordAiQueryMutationResult = NonNullable<
+  Awaited<ReturnType<typeof cordAiQuery>>
+>;
+export type CordAiQueryMutationBody = BodyType<CordAiRequest>;
+export type CordAiQueryMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Query CORD AI agent
+ */
+export const useCordAiQuery = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof cordAiQuery>>,
+    TError,
+    { data: BodyType<CordAiRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof cordAiQuery>>,
+  TError,
+  { data: BodyType<CordAiRequest> },
+  TContext
+> => {
+  return useMutation(getCordAiQueryMutationOptions(options));
+};
+
+/**
+ * Sends text to ElevenLabs TTS and returns audio data
+ * @summary Convert text to speech
+ */
+export const getCordTtsUrl = () => {
+  return `/api/cord/tts`;
+};
+
+export const cordTts = async (
+  cordTtsRequest: CordTtsRequest,
+  options?: RequestInit,
+): Promise<CordTtsResponse> => {
+  return customFetch<CordTtsResponse>(getCordTtsUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(cordTtsRequest),
+  });
+};
+
+export const getCordTtsMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof cordTts>>,
+    TError,
+    { data: BodyType<CordTtsRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof cordTts>>,
+  TError,
+  { data: BodyType<CordTtsRequest> },
+  TContext
+> => {
+  const mutationKey = ["cordTts"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof cordTts>>,
+    { data: BodyType<CordTtsRequest> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return cordTts(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CordTtsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof cordTts>>
+>;
+export type CordTtsMutationBody = BodyType<CordTtsRequest>;
+export type CordTtsMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Convert text to speech
+ */
+export const useCordTts = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof cordTts>>,
+    TError,
+    { data: BodyType<CordTtsRequest> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof cordTts>>,
+  TError,
+  { data: BodyType<CordTtsRequest> },
+  TContext
+> => {
+  return useMutation(getCordTtsMutationOptions(options));
+};

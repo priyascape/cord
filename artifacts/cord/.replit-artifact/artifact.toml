@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "CORD — Matrix AI Screensaver"
+version = "1.0.0"
+id = "artifacts/cord"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18688
+
+[services.development]
+run = "pnpm --filter @workspace/cord run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/cord", "run", "build" ]
+publicDir = "artifacts/cord/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18688"
+BASE_PATH = "/"

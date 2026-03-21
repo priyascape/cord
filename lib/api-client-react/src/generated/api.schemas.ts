@@ -8,3 +8,34 @@
 export interface HealthStatus {
   status: string;
 }
+
+export interface CordAiRequest {
+  /** The user's spoken transcript */
+  transcript: string;
+  /** Optional Gemini API key override (for demo purposes) */
+  geminiApiKey?: string;
+}
+
+export interface CordAiResponse {
+  /** The AI agent's response text */
+  response: string;
+}
+
+export interface CordTtsRequest {
+  /** Text to convert to speech */
+  text: string;
+  /** Optional ElevenLabs API key override (for demo purposes) */
+  elevenLabsApiKey?: string;
+}
+
+export interface CordTtsResponse {
+  /** Base64-encoded audio data (MP3) */
+  audioBase64: string;
+  /** Audio content type */
+  contentType: string;
+}
+
+export interface ErrorResponse {
+  error: string;
+  message?: string;
+}
