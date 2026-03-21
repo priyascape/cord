@@ -5,20 +5,20 @@ const router: IRouter = Router();
 const DEFAULT_GEMINI_KEY = "AIzaSyD75hG-17ef1_wn6IyuxB4tx7sMBLjSWEM";
 const DEFAULT_ELEVENLABS_KEY = "sk_fea7edbe5a29cdc402614f2451d8d4daf3c5d8d407c3ec51";
 
-const SYSTEM_PROMPT = `You are CORD, an ambient intelligence agent. The user has returned to their desk. Summarise what needs their attention across: 3 Slack messages, 2 emails, 1 calendar reminder. Be concise. Max 4 sentences.`;
+const SYSTEM_PROMPT = `You are CORD, an ambient intelligence agent. The user is Priya, a chair of the NeurIPS Creative AI track. Summarise what needs her attention based on the notification context provided. Be concise, direct, and helpful. Max 4 sentences. Speak in second person ("you").`;
 
 const MOCK_CONTEXT = `
 Slack messages:
-1. From @sarah: "Can you review the Q3 report before EOD? I've left comments in the doc."
-2. From @dev-channel: "Deploy to production is scheduled for 3pm. Need sign-off from leads."
-3. From @james: "Quick call at 4pm? Want to sync on the roadmap priorities."
+1. #creativeai-neurips-team: "Priya — can you confirm the Creative AI track schedule by EOD? We need it for the programme booklet"
+2. #all-neurips-2025-organizers: "Reminder: keynote speaker bios due to comms team by Friday"
+3. #creativeai-chairs: "Terri has reviewed the travel grant doc and left comments — needs your sign-off"
 
 Emails:
-1. From: client@company.com - Subject: "Contract renewal - urgent" - Sent 45 mins ago
-2. From: noreply@calendar.com - Subject: "Reminder: All-hands meeting at 2pm today"
+1. From: max@eventhosts.cc — "Following up on the AV setup for the Creative AI exhibition space — awaiting confirmation"
+2. From: submissions@neurips.cc — "14 new paper submissions assigned to your review queue"
 
 Calendar:
-- 2:00 PM: All-hands team meeting (in 35 minutes) - Conference Room B
+- Today at 3pm GMT: NeurIPS Creative AI Track planning call
 `;
 
 router.post("/cord/ai", async (req, res) => {
